@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">Popular Movies</string>
+    <string name="most_popular">Most Popular</string>
+    <string name="top_rated">Top Rated</string>
+    <!-- Error messages-->
+    <string name="detail_error_message">Movie data not available</string>
+
+    <string name="vote_average">Vote Average: </string>
+    <string name="plot_synopsis">Plot Synopsis: </string>
+    <string name="release_date">Release Date: </string>
 </resources>
