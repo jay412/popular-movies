@@ -1,5 +1,8 @@
 package com.herokuapp.jordan_chau.popularmovies.utils;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,8 +22,10 @@ import java.util.Scanner;
 public class NetworkUtility {
 
     //private static final String TAG = NetworkUtility.class.getSimpleName();
-    private static final String POPULAR = "http://api.themoviedb.org/3/movie/popular";
-    private static final String TOP_RATED = "https://api.themoviedb.org/3/movie/top_rated";
+    private static final String BASE_URL = "https://api.themoviedb.org/3/movie/";
+    //private static final String POPULAR = "http://api.themoviedb.org/3/movie/popular";
+    //private static final String TOP_RATED = "https://api.themoviedb.org/3/movie/top_rated";
+    //private static String trailers = "https://api.themoviedb.org/3/movie/"
 
     private final static String API_PARAM = "api_key";
 
@@ -35,11 +40,13 @@ public class NetworkUtility {
         String baseUrl;
         switch (url) {
             case "popular":
-                baseUrl = POPULAR;
+                baseUrl = BASE_URL.concat("popular");
                 break;
             case "top_rated":
-                baseUrl = TOP_RATED;
+                baseUrl = BASE_URL.concat("top_rated");
                 break;
+            case "videos":
+                baseUrl = BASE_URL
             default:
                 baseUrl = "ERROR";
                 break;
@@ -82,5 +89,14 @@ public class NetworkUtility {
         } finally {
             urlConnection.disconnect();
         }
+    }
+
+    public static Boolean checkInternetConnection(Context context){
+        ConnectivityManager cm =
+                (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+
+        return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
     }
 }

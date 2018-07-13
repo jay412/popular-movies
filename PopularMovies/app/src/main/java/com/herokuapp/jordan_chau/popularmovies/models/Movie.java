@@ -6,11 +6,13 @@ import android.os.Parcelable;
 public class Movie implements Parcelable{
     private String movieName, image, releaseDate, plotSynopsis, backDrop;
     private Double voteAverage;
+    private int id;
     private final String BASE_URL = "http://image.tmdb.org/t/p/w185/";
     private final String DETAIL_URL = "http://image.tmdb.org/t/p/w500/";
     private final String BACKDROP_URL = "http://image.tmdb.org/t/p/w780/";
 
-    public Movie(String mName, String image, String releaseDate, Double voteAverage, String plotSynopsis, String backDrop) {
+    public Movie(String mName, String image, String releaseDate, Double voteAverage, String plotSynopsis, String backDrop, int id) {
+        this.id = id;
         this.movieName = mName;
         this.image = image;
         this.releaseDate = releaseDate;

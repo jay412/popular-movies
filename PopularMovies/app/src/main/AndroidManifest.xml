@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.herokuapp.jordan_chau.popularmovies">
 
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
@@ -18,7 +19,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MovieDetailsActivity"></activity>
+        <activity android:name=".MovieDetailsActivity"
+            android:parentActivityName="com.herokuapp.jordan_chau.popularmovies.MainActivity">
+        </activity>
     </application>
 
 </manifest>
