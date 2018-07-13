@@ -46,7 +46,7 @@ public class NetworkUtility {
                 baseUrl = BASE_URL.concat("top_rated");
                 break;
             case "videos":
-                baseUrl = BASE_URL
+                baseUrl = BASE_URL;
             default:
                 baseUrl = "ERROR";
                 break;

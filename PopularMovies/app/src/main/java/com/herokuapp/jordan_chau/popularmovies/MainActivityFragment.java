@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -25,9 +26,8 @@ import java.util.ArrayList;
 public class MainActivityFragment extends Fragment {
 
     private GridView gridView;
-    //TODO: Place API KEY below
-    private static final String API_KEY = "";
-    private Boolean internet_error = false;
+    //TODO: Place API KEY in gradle properties
+    private static final String API_KEY = BuildConfig.API_KEY;
 
     public MainActivityFragment() { }
 
@@ -57,10 +57,18 @@ public class MainActivityFragment extends Fragment {
 
         @Override
         protected void onPreExecute() {
-            super.onPreExecute();
+            //checks for internet connection before proceeding
+            if(!NetworkUtility.checkInternetConnection(getActivity())) {
+                this.cancel(true);
+                showErrorMessage();
+                //Log.v("MAF.java: ", "NO WIFI");
+            }
+            else {
+                super.onPreExecute();
 
-            progressDialog.setTitle("Please wait ...");
-            progressDialog.show();
+                progressDialog.setTitle("Please wait ...");
+                progressDialog.show();
+            }
         }
 
         @Override
@@ -81,6 +89,8 @@ public class MainActivityFragment extends Fragment {
                 e.printStackTrace();
                 return null;
             }
+
+
         }
 
         @Override
@@ -90,10 +100,8 @@ public class MainActivityFragment extends Fragment {
             if(mData != null) {
                 MovieAdapter movieAdapter = new MovieAdapter(getActivity(), mData);
                 gridView.setAdapter(movieAdapter);
-                internet_error = false;
             } else {
                 showErrorMessage();
-                internet_error = true;
             }
         }
     }
@@ -111,6 +119,7 @@ public class MainActivityFragment extends Fragment {
 
         for(int i = 0; i < results.length(); ++i) {
             String title, posterPath, releaseDate, plotSynopsis, backDrop;
+            int id;
             Double voteAverage;
 
             JSONObject currentMovie = results.getJSONObject(i);
@@ -121,8 +130,9 @@ public class MainActivityFragment extends Fragment {
             voteAverage = currentMovie.getDouble("vote_average");
             plotSynopsis = currentMovie.getString("overview");
             backDrop = currentMovie.getString("backdrop_path");
+            id = currentMovie.getInt("id");
 
-            parsedMovieData.add(new Movie(title, posterPath, releaseDate, voteAverage, plotSynopsis, backDrop));
+            parsedMovieData.add(new Movie(title, posterPath, releaseDate, voteAverage, plotSynopsis, backDrop, id));
         }
 
         return parsedMovieData;
@@ -136,13 +146,11 @@ public class MainActivityFragment extends Fragment {
         switch (item.getItemId()) {
             case R.id.most_popular:
                 new GetOperation().execute(API_KEY, "popular");
-                if (!internet_error)
                     getActivity().setTitle("Most Popular");
                 return true;
             case R.id.top_rated:
                 new GetOperation().execute(API_KEY, "top_rated");
-                if (!internet_error)
-                    getActivity().setTitle("Top Rated");
+                getActivity().setTitle("Top Rated");
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
