@@ -3,6 +3,18 @@ package com.herokuapp.jordan_chau.popularmovies.models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.herokuapp.jordan_chau.popularmovies.BuildConfig;
+import com.herokuapp.jordan_chau.popularmovies.utils.NetworkUtility;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.lang.reflect.Array;
+import java.net.URL;
+import java.util.ArrayList;
+
 public class Movie implements Parcelable{
     private String movieName, image, releaseDate, plotSynopsis, backDrop;
     private Double voteAverage;
@@ -22,6 +34,7 @@ public class Movie implements Parcelable{
     }
 
     private Movie(Parcel in) {
+        id = in.readInt();
         movieName = in.readString();
         image = in.readString();
         releaseDate = in.readString();
@@ -68,6 +81,10 @@ public class Movie implements Parcelable{
 
     public String getBackDrop() { return backDrop; }
 
+    public int getId() {
+        return id;
+    }
+
     public String setPicSize(String url, String size) {
         switch (size) {
             case "detail":
@@ -88,6 +105,7 @@ public class Movie implements Parcelable{
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(id);
         dest.writeString(movieName);
         dest.writeString(image);
         dest.writeString(releaseDate);

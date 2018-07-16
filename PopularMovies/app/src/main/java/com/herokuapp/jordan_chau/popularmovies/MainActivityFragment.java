@@ -26,7 +26,6 @@ import java.util.ArrayList;
 public class MainActivityFragment extends Fragment {
 
     private GridView gridView;
-    //TODO: Place API KEY in gradle properties
     private static final String API_KEY = BuildConfig.API_KEY;
 
     public MainActivityFragment() { }
@@ -84,6 +83,8 @@ public class MainActivityFragment extends Fragment {
                 String jsonUserResponse = NetworkUtility.getHttpUrlResponse(movieRequestUrl);
                 ArrayList<Movie> movieData = getMovieStringsFromJson(jsonUserResponse);
 
+                //Log.v("MAF", "json= " + jsonUserResponse);
+
                 return movieData;
             } catch (Exception e) {
                 e.printStackTrace();
@@ -106,7 +107,7 @@ public class MainActivityFragment extends Fragment {
         }
     }
 
-    private void showErrorMessage() {
+    public void showErrorMessage() {
         Toast.makeText(getActivity(),"Please check your internet connection and try again.", Toast.LENGTH_LONG).show();
     }
 
@@ -131,6 +132,7 @@ public class MainActivityFragment extends Fragment {
             plotSynopsis = currentMovie.getString("overview");
             backDrop = currentMovie.getString("backdrop_path");
             id = currentMovie.getInt("id");
+            //Log.v("MAF", "id= " + id);
 
             parsedMovieData.add(new Movie(title, posterPath, releaseDate, voteAverage, plotSynopsis, backDrop, id));
         }

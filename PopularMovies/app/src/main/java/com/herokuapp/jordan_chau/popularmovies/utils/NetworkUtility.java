@@ -4,6 +4,8 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.util.Log;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -21,13 +23,15 @@ import java.util.Scanner;
  */
 public class NetworkUtility {
 
-    //private static final String TAG = NetworkUtility.class.getSimpleName();
+    private static final String TAG = NetworkUtility.class.getSimpleName();
     private static final String BASE_URL = "https://api.themoviedb.org/3/movie/";
     //private static final String POPULAR = "http://api.themoviedb.org/3/movie/popular";
     //private static final String TOP_RATED = "https://api.themoviedb.org/3/movie/top_rated";
     //private static String trailers = "https://api.themoviedb.org/3/movie/"
 
     private final static String API_PARAM = "api_key";
+    private final static String TRAILER_KW = "/videos";
+    private final static String REVIEWS_KW = "/reviews";
 
     /**
      * This method builds a URL with the specified api parameter
@@ -45,8 +49,6 @@ public class NetworkUtility {
             case "top_rated":
                 baseUrl = BASE_URL.concat("top_rated");
                 break;
-            case "videos":
-                baseUrl = BASE_URL;
             default:
                 baseUrl = "ERROR";
                 break;
@@ -62,6 +64,35 @@ public class NetworkUtility {
         }
 
         //Log.v(TAG, "Built URI " + builtURL);
+
+        return builtURL;
+    }
+
+    public static URL buildMovieURL(int movieID, String apiQuery, String type){
+        String baseUrl = BASE_URL.concat(Integer.toString(movieID));
+
+        switch (type) {
+            case "trailers":
+                baseUrl = baseUrl.concat(TRAILER_KW);
+                break;
+            case "reviews":
+                baseUrl = baseUrl.concat(REVIEWS_KW);
+                break;
+            default:
+                baseUrl = "ERROR";
+                break;
+        }
+
+        Uri uri = Uri.parse(baseUrl).buildUpon().appendQueryParameter(API_PARAM, apiQuery).build();
+
+        URL builtURL = null;
+        try {
+            builtURL = new URL(uri.toString());
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+
+        Log.v(TAG, "Built URI = " + builtURL);
 
         return builtURL;
     }
