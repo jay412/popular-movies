@@ -3,12 +3,17 @@ package com.herokuapp.jordan_chau.popularmovies;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Network;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,9 +27,13 @@ import org.json.JSONObject;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class MovieDetailsActivity extends AppCompatActivity {
     private TextView reviews;
+    private HashMap<String, String> trailers;
+    private LinearLayout trailerLayout;
+    private final String YOUTUBE_URL = "https://www.youtube.com/watch?v=";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +50,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
         TextView releaseDate = findViewById(R.id.tv_release_date);
         reviews = findViewById(R.id.tv_reviews);
         ImageView backDrop = findViewById(R.id.iv_backdrop);
+        trailerLayout = findViewById(R.id.ll_trailers);
 
         Intent intent = getIntent();
         if (intent == null) {
@@ -93,12 +103,16 @@ public class MovieDetailsActivity extends AppCompatActivity {
             }
 
             URL reviewUrl = NetworkUtility.buildMovieURL(params[0], BuildConfig.API_KEY, "reviews");
+            URL trailerUrl = NetworkUtility.buildMovieURL(params[0], BuildConfig.API_KEY, "trailers");
 
             try {
                 String jsonUserResponse = NetworkUtility.getHttpUrlResponse(reviewUrl);
-                ArrayList<String> reviewData = parseReviewsString(jsonUserResponse);
+                String jsonTrailerResponse = NetworkUtility.getHttpUrlResponse(trailerUrl);
 
-                //Log.v("MDA.java: ", "json = " + jsonUserResponse);
+                ArrayList<String> reviewData = parseReviewsString(jsonUserResponse);
+                trailers = parseTrailersString(jsonTrailerResponse);
+
+                Log.v("MDA.java: ", "json = " + jsonTrailerResponse);
 
                 return reviewData;
             } catch (Exception e) {
@@ -116,6 +130,26 @@ public class MovieDetailsActivity extends AppCompatActivity {
                 }
 
                 reviews.setText(reviewText);
+            }
+
+            if(trailers != null) {
+                for (String name : trailers.keySet()) {
+                    final String key = trailers.get(name);
+
+                    Button b = new Button(context);
+                    b.setText(name);
+                    //b.setTypeface(getResources().getFont(R.font.chela_one_regular));
+                    b.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Uri uri = Uri.parse(key);
+                            Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                            startActivity(intent);
+                        }
+                    });
+
+                    trailerLayout.addView(b);
+                }
             }
 
             progressDialog.dismiss();
@@ -159,5 +193,26 @@ public class MovieDetailsActivity extends AppCompatActivity {
         }
 
         return parsedReviewData;
+    }
+
+    public HashMap<String, String> parseTrailersString(String json) throws JSONException{
+
+        JSONObject reviews = new JSONObject(json);
+        JSONArray results = reviews.getJSONArray("results");
+
+        HashMap<String, String> parsedTrailerData = new HashMap<>();
+
+        for(int i = 0; i < results.length(); ++i) {
+            String name, key;
+
+            JSONObject currentTrailer = results.getJSONObject(i);
+
+            name = currentTrailer.getString("name");
+            key = YOUTUBE_URL.concat(currentTrailer.getString("key"));
+
+            parsedTrailerData.put(name, key);
+        }
+
+        return parsedTrailerData;
     }
 }
