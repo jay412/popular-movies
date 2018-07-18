@@ -3,15 +3,18 @@ package com.herokuapp.jordan_chau.popularmovies;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.net.Network;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -136,9 +139,9 @@ public class MovieDetailsActivity extends AppCompatActivity {
                 for (String name : trailers.keySet()) {
                     final String key = trailers.get(name);
 
-                    Button b = new Button(context);
-                    b.setText(name);
-                    //b.setTypeface(getResources().getFont(R.font.chela_one_regular));
+                    ImageButton b = new ImageButton(context);
+                    //b.setText(name);
+                    b.setBackgroundResource(R.drawable.ic_play);
                     b.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -148,7 +151,15 @@ public class MovieDetailsActivity extends AppCompatActivity {
                         }
                     });
 
+                    TextView tv = new TextView(context);
+                    //doesn't work
+                    //Typeface custom_font = Typeface.createFromAsset(context.getAssets(), "font/chela_one_regular.ttf");
+                    //tv.setTypeface(custom_font);
+                    tv.setText(name);
+
+                    //add button first, then textview
                     trailerLayout.addView(b);
+                    trailerLayout.addView(tv);
                 }
             }
 
@@ -162,12 +173,21 @@ public class MovieDetailsActivity extends AppCompatActivity {
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.movie_details_menu, menu);
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
         // handles back arrow presses
         if(id == android.R.id.home) {
             finish();
+        } else if (id == R.id.action_favorite) {
+            return true;
         }
 
         return super.onOptionsItemSelected(item);

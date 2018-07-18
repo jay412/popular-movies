@@ -2,6 +2,8 @@
     <string name="app_name">Popular Movies</string>
     <string name="most_popular">Most Popular</string>
     <string name="top_rated">Top Rated</string>
+    <string name="favorite">My Favorites</string>
+    <string name="star_favorite">Favorite</string>
     <!-- Error messages-->
     <string name="detail_error_message">Movie data not available</string>
 
