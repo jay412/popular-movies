@@ -1,8 +1,10 @@
 package com.herokuapp.jordan_chau.popularmovies;
 
 import android.app.ProgressDialog;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Typeface;
 import android.net.Network;
 import android.net.Uri;
@@ -20,6 +22,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.herokuapp.jordan_chau.popularmovies.database.FavoriteContract;
+import com.herokuapp.jordan_chau.popularmovies.database.FavoriteDbHelper;
 import com.herokuapp.jordan_chau.popularmovies.models.Movie;
 import com.herokuapp.jordan_chau.popularmovies.utils.NetworkUtility;
 import com.squareup.picasso.Picasso;
@@ -36,6 +40,11 @@ public class MovieDetailsActivity extends AppCompatActivity {
     private TextView reviews;
     private HashMap<String, String> trailers;
     private LinearLayout trailerLayout;
+
+    private SQLiteDatabase mDb;
+
+    private Movie m;
+
     private final String YOUTUBE_URL = "https://www.youtube.com/watch?v=";
 
     @Override
@@ -60,7 +69,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
             closeOnError();
         }
 
-        Movie m = intent.getParcelableExtra("movie");
+        m = intent.getParcelableExtra("movie");
         setTitle(m.getTitle());
 
         Picasso.with(this).load(m.setPicSize(m.getImage(), "detail")).into(image);
@@ -70,6 +79,8 @@ public class MovieDetailsActivity extends AppCompatActivity {
         releaseDate.setText(m.getReleaseDate());
 
         //Log.v("MDA: ", "id= " + m.getId());
+        FavoriteDbHelper dbHelper = new FavoriteDbHelper(this);
+        mDb = dbHelper.getWritableDatabase();
 
         new GetOperation(this).execute(m.getId());
     }
@@ -234,5 +245,21 @@ public class MovieDetailsActivity extends AppCompatActivity {
         }
 
         return parsedTrailerData;
+    }
+
+    public long addToFavorites() {
+        if (m.getTitle() == null) {
+            return 0;
+        }
+
+        String title = m.getTitle();
+        int id = m.getId();
+
+        ContentValues cv = new ContentValues();
+
+        cv.put(FavoriteContract.FavoriteEntry.COLUMN_MOVIE_NAME, title);
+        cv.put(FavoriteContract.FavoriteEntry.COLUMN_MOVIE_ID, id);
+
+        return mDb.insert(FavoriteContract.FavoriteEntry.TABLE_NAME, null, cv);
     }
 }

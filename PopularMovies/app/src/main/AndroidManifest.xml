@@ -19,9 +19,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MovieDetailsActivity"
-            android:parentActivityName="com.herokuapp.jordan_chau.popularmovies.MainActivity">
-        </activity>
+        <activity
+            android:name=".MovieDetailsActivity"
+            android:parentActivityName=".MainActivity"></activity>
+        <activity android:name=".FavoriteMoviesActivity"></activity>
     </application>
 
 </manifest>

@@ -10,20 +10,22 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.herokuapp.jordan_chau.popularmovies.MovieDetailsActivity;
 import com.herokuapp.jordan_chau.popularmovies.R;
+import com.herokuapp.jordan_chau.popularmovies.database.FavoriteContract;
 import com.herokuapp.jordan_chau.popularmovies.models.Movie;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
-public class MovieAdapter extends ArrayAdapter<Movie>{
+public class FavoriteAdapter extends ArrayAdapter<Movie>{
 
     private Activity currentActivity;
     private Cursor mCursor;
 
-    public MovieAdapter(Activity context, ArrayList<Movie> movies, Cursor cursor) {
+    public FavoriteAdapter(Activity context, ArrayList<Movie> movies, Cursor cursor) {
         super(context, 0, movies);
         currentActivity = context;
         mCursor = cursor;
@@ -35,13 +37,20 @@ public class MovieAdapter extends ArrayAdapter<Movie>{
         Movie movie = getItem(position);
 
         if (convertView == null) {
-            convertView = LayoutInflater.from(getContext()).inflate(R.layout.movie_item, parent, false);
+            convertView = LayoutInflater.from(getContext()).inflate(R.layout.favorite_item, parent, false);
         }
 
-        ImageView movieView = convertView.findViewById(R.id.movie_image);
-        Picasso.with(this.getContext()).load(movie.setPicSize(movie.getImage(), "home")).into(movieView);
+        //ImageView movieView = convertView.findViewById(R.id.movie_image);
+        //Picasso.with(this.getContext()).load(movie.setPicSize(movie.getImage(), "home")).into(movieView);
 
-        setImageOnClickListener(movieView, movie);
+        //setImageOnClickListener(movieView, movie);
+
+        if(!mCursor.moveToPosition(position))
+            return null;
+
+        String name = mCursor.getString(mCursor.getColumnIndex(FavoriteContract.FavoriteEntry.COLUMN_MOVIE_NAME));
+        TextView favoriteName = convertView.findViewById(R.id.favorite_name);
+        favoriteName.setText(name);
 
         return convertView;
     }

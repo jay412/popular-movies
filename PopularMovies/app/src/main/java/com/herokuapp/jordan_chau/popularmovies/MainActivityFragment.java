@@ -1,6 +1,7 @@
 package com.herokuapp.jordan_chau.popularmovies;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -99,7 +100,7 @@ public class MainActivityFragment extends Fragment {
             progressDialog.dismiss();
 
             if(mData != null) {
-                MovieAdapter movieAdapter = new MovieAdapter(getActivity(), mData);
+                MovieAdapter movieAdapter = new MovieAdapter(getActivity(), mData, null);
                 gridView.setAdapter(movieAdapter);
             } else {
                 showErrorMessage();
@@ -154,6 +155,9 @@ public class MainActivityFragment extends Fragment {
                 new GetOperation().execute(API_KEY, "top_rated");
                 getActivity().setTitle("Top Rated");
                 return true;
+            case R.id.action_favorite:
+                Intent i = new Intent(getActivity(), FavoriteMoviesActivity.class);
+                getActivity().startActivity(i);
             default:
                 return super.onOptionsItemSelected(item);
         }
