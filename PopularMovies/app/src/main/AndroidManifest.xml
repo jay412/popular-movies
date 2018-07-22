@@ -20,9 +20,10 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".MovieDetailsActivity"
+            android:name=".MovieDetailsActivity"></activity>
+        <activity
+            android:name=".FavoriteMoviesActivity"
             android:parentActivityName=".MainActivity"></activity>
-        <activity android:name=".FavoriteMoviesActivity"></activity>
     </application>
 
 </manifest>

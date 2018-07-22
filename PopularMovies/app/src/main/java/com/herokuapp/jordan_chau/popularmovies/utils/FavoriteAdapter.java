@@ -5,10 +5,12 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.Layout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -20,37 +22,54 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
-public class FavoriteAdapter extends ArrayAdapter<Movie>{
+public class FavoriteAdapter extends BaseAdapter{
 
     private Activity currentActivity;
     private Cursor mCursor;
 
-    public FavoriteAdapter(Activity context, ArrayList<Movie> movies, Cursor cursor) {
-        super(context, 0, movies);
+    public FavoriteAdapter(Activity context, Cursor cursor) {
         currentActivity = context;
         mCursor = cursor;
+    }
+
+    @Override
+    public int getCount() {
+        return mCursor.getCount();
+    }
+
+    @Override
+    public Object getItem(int position) {
+        return null;
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return 0;
     }
 
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-        Movie movie = getItem(position);
 
         if (convertView == null) {
-            convertView = LayoutInflater.from(getContext()).inflate(R.layout.favorite_item, parent, false);
+            convertView = LayoutInflater.from(currentActivity).inflate(R.layout.movie_item, parent, false);
         }
-
-        //ImageView movieView = convertView.findViewById(R.id.movie_image);
-        //Picasso.with(this.getContext()).load(movie.setPicSize(movie.getImage(), "home")).into(movieView);
-
-        //setImageOnClickListener(movieView, movie);
 
         if(!mCursor.moveToPosition(position))
             return null;
 
-        String name = mCursor.getString(mCursor.getColumnIndex(FavoriteContract.FavoriteEntry.COLUMN_MOVIE_NAME));
-        TextView favoriteName = convertView.findViewById(R.id.favorite_name);
-        favoriteName.setText(name);
+        String title = mCursor.getString(mCursor.getColumnIndex(FavoriteContract.FavoriteEntry.COLUMN_MOVIE_NAME));
+        String image = mCursor.getString(mCursor.getColumnIndex(FavoriteContract.FavoriteEntry.COLUMN_IMAGE));
+        String releaseDate = mCursor.getString(mCursor.getColumnIndex(FavoriteContract.FavoriteEntry.COLUMN_RELEASE_DATE));
+        Double voteAverage = mCursor.getDouble(mCursor.getColumnIndex(FavoriteContract.FavoriteEntry.COLUMN_VOTE_AVERAGE));
+        String plotSynopsis = mCursor.getString(mCursor.getColumnIndex(FavoriteContract.FavoriteEntry.COLUMN_PLOT_SYNOPSIS));
+        String backdrop = mCursor.getString(mCursor.getColumnIndex(FavoriteContract.FavoriteEntry.COLUMN_BACKDROP));
+        int id = mCursor.getInt(mCursor.getColumnIndex(FavoriteContract.FavoriteEntry.COLUMN_MOVIE_ID));
+
+        ImageView movieView = convertView.findViewById(R.id.movie_image);
+        Picasso.with(currentActivity).load(Movie.setPicSize(image, "home")).into(movieView);
+
+        setImageOnClickListener(movieView, new Movie(title, image, releaseDate, voteAverage, plotSynopsis,backdrop, id));
 
         return convertView;
     }
@@ -66,7 +85,15 @@ public class FavoriteAdapter extends ArrayAdapter<Movie>{
         });
     }
 
-    public int getItemCount() {
-        return mCursor.getCount();
+    public void swapCursor(Cursor newCursor) {
+        if (mCursor != null) {
+            mCursor.close();
+        }
+
+        mCursor = newCursor;
+
+        if(newCursor != null) {
+            this.notifyDataSetChanged();
+        }
     }
 }

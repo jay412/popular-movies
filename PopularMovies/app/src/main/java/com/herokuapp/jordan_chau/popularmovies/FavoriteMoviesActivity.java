@@ -5,12 +5,10 @@ import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.GridView;
-import android.widget.LinearLayout;
 
 import com.herokuapp.jordan_chau.popularmovies.database.FavoriteContract;
 import com.herokuapp.jordan_chau.popularmovies.database.FavoriteDbHelper;
 import com.herokuapp.jordan_chau.popularmovies.utils.FavoriteAdapter;
-import com.herokuapp.jordan_chau.popularmovies.utils.MovieAdapter;
 
 public class FavoriteMoviesActivity extends AppCompatActivity {
 
@@ -23,13 +21,19 @@ public class FavoriteMoviesActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_favorite_movies);
 
+        setTitle("My Favorites");
+
+        //Creates the back arrow on the top left corner to return to MainActivity
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+
         mGrid = findViewById(R.id.fgrid);
 
         FavoriteDbHelper dbHelper = new FavoriteDbHelper(this);
         mDb = dbHelper.getReadableDatabase();
         //get data
         Cursor cursor = getAllFavoriteMovie();
-        mAdapter = new FavoriteAdapter(this, null, cursor);
+        mAdapter = new FavoriteAdapter(this, cursor);
         mGrid.setAdapter(mAdapter);
     }
 

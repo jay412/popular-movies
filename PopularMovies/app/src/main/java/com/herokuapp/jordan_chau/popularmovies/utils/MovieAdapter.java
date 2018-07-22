@@ -21,12 +21,10 @@ import java.util.ArrayList;
 public class MovieAdapter extends ArrayAdapter<Movie>{
 
     private Activity currentActivity;
-    private Cursor mCursor;
 
-    public MovieAdapter(Activity context, ArrayList<Movie> movies, Cursor cursor) {
+    public MovieAdapter(Activity context, ArrayList<Movie> movies) {
         super(context, 0, movies);
         currentActivity = context;
-        mCursor = cursor;
     }
 
     @NonNull
@@ -55,9 +53,5 @@ public class MovieAdapter extends ArrayAdapter<Movie>{
                 currentActivity.startActivity(i);
             }
         });
-    }
-
-    public int getItemCount() {
-        return mCursor.getCount();
     }
 }

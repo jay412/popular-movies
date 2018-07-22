@@ -3,25 +3,13 @@ package com.herokuapp.jordan_chau.popularmovies.models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.herokuapp.jordan_chau.popularmovies.BuildConfig;
-import com.herokuapp.jordan_chau.popularmovies.utils.NetworkUtility;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
-import java.lang.reflect.Array;
-import java.net.URL;
-import java.util.ArrayList;
-
 public class Movie implements Parcelable{
     private String movieName, image, releaseDate, plotSynopsis, backDrop;
     private Double voteAverage;
     private int id;
-    private final String BASE_URL = "http://image.tmdb.org/t/p/w185/";
-    private final String DETAIL_URL = "http://image.tmdb.org/t/p/w500/";
-    private final String BACKDROP_URL = "http://image.tmdb.org/t/p/w780/";
+    private static final String BASE_URL = "http://image.tmdb.org/t/p/w185/";
+    private static final String DETAIL_URL = "http://image.tmdb.org/t/p/w500/";
+    private static final String BACKDROP_URL = "http://image.tmdb.org/t/p/w780/";
 
     public Movie(String mName, String image, String releaseDate, Double voteAverage, String plotSynopsis, String backDrop, int id) {
         this.id = id;
@@ -85,7 +73,7 @@ public class Movie implements Parcelable{
         return id;
     }
 
-    public String setPicSize(String url, String size) {
+    public static String setPicSize(String url, String size) {
         switch (size) {
             case "detail":
                 return DETAIL_URL.concat(url);

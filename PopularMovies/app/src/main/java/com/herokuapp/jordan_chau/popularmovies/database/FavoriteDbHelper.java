@@ -20,6 +20,11 @@ public class FavoriteDbHelper extends SQLiteOpenHelper{
                 FavoriteContract.FavoriteEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                 FavoriteContract.FavoriteEntry.COLUMN_MOVIE_ID + " INTEGER NOT NULL," +
                 FavoriteContract.FavoriteEntry.COLUMN_MOVIE_NAME + " TEXT NOT NULL," +
+                FavoriteContract.FavoriteEntry.COLUMN_IMAGE + " TEXT NOT NULL," +
+                FavoriteContract.FavoriteEntry.COLUMN_RELEASE_DATE + " TEXT NOT NULL," +
+                FavoriteContract.FavoriteEntry.COLUMN_VOTE_AVERAGE + " REAL," +
+                FavoriteContract.FavoriteEntry.COLUMN_PLOT_SYNOPSIS + " TEXT NOT NULL," +
+                FavoriteContract.FavoriteEntry.COLUMN_BACKDROP + " TEXT NOT NULL," +
                 FavoriteContract.FavoriteEntry.COLUMN_TIMESTAMP + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP" +
                 ");";
 

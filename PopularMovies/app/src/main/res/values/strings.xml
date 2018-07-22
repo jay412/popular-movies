@@ -12,4 +12,9 @@
     <string name="release_date">Release Date: </string>
     <string name="trailers">Trailers: </string>
     <string name="reviews">Reviews: </string>
+
+    <!-- content descriptions -->
+    <string name="movie_image_desc">movie image</string>
+    <string name="movie_detail_img_desc">bigger movie image</string>
+    <string name="movie_backdrop_img_desc">movie backdrop image</string>
 </resources>

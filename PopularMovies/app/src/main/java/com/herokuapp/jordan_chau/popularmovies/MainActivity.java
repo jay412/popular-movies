@@ -30,6 +30,8 @@ public class MainActivity extends AppCompatActivity {
                 return false;
             case R.id.top_rated:
                 return false;
+            case R.id.favorites:
+                return false;
             default:
                 return super.onOptionsItemSelected(item);
         }

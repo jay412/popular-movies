@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -37,6 +36,7 @@ public class MainActivityFragment extends Fragment {
         //allows fragment to handle options menu
         setHasOptionsMenu(true);
 
+        getActivity().setTitle("Most Popular");
         // Get a reference to the ListView, and attach this adapter to it.
         gridView = rootView.findViewById(R.id.grid);
 
@@ -53,7 +53,7 @@ public class MainActivityFragment extends Fragment {
      * Returns an array of movie data to be formatted
      */
     private class GetOperation extends AsyncTask<String, Void, ArrayList<Movie>> {
-        ProgressDialog progressDialog = new ProgressDialog(getActivity());
+        final ProgressDialog progressDialog = new ProgressDialog(getActivity());
 
         @Override
         protected void onPreExecute() {
@@ -61,7 +61,6 @@ public class MainActivityFragment extends Fragment {
             if(!NetworkUtility.checkInternetConnection(getActivity())) {
                 this.cancel(true);
                 showErrorMessage();
-                //Log.v("MAF.java: ", "NO WIFI");
             }
             else {
                 super.onPreExecute();
@@ -84,15 +83,11 @@ public class MainActivityFragment extends Fragment {
                 String jsonUserResponse = NetworkUtility.getHttpUrlResponse(movieRequestUrl);
                 ArrayList<Movie> movieData = getMovieStringsFromJson(jsonUserResponse);
 
-                //Log.v("MAF", "json= " + jsonUserResponse);
-
                 return movieData;
             } catch (Exception e) {
                 e.printStackTrace();
                 return null;
             }
-
-
         }
 
         @Override
@@ -100,7 +95,7 @@ public class MainActivityFragment extends Fragment {
             progressDialog.dismiss();
 
             if(mData != null) {
-                MovieAdapter movieAdapter = new MovieAdapter(getActivity(), mData, null);
+                MovieAdapter movieAdapter = new MovieAdapter(getActivity(), mData);
                 gridView.setAdapter(movieAdapter);
             } else {
                 showErrorMessage();
@@ -108,7 +103,7 @@ public class MainActivityFragment extends Fragment {
         }
     }
 
-    public void showErrorMessage() {
+    private void showErrorMessage() {
         Toast.makeText(getActivity(),"Please check your internet connection and try again.", Toast.LENGTH_LONG).show();
     }
 
@@ -133,7 +128,6 @@ public class MainActivityFragment extends Fragment {
             plotSynopsis = currentMovie.getString("overview");
             backDrop = currentMovie.getString("backdrop_path");
             id = currentMovie.getInt("id");
-            //Log.v("MAF", "id= " + id);
 
             parsedMovieData.add(new Movie(title, posterPath, releaseDate, voteAverage, plotSynopsis, backDrop, id));
         }
@@ -155,9 +149,10 @@ public class MainActivityFragment extends Fragment {
                 new GetOperation().execute(API_KEY, "top_rated");
                 getActivity().setTitle("Top Rated");
                 return true;
-            case R.id.action_favorite:
+            case R.id.favorites:
                 Intent i = new Intent(getActivity(), FavoriteMoviesActivity.class);
                 getActivity().startActivity(i);
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }

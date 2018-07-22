@@ -25,9 +25,6 @@ public class NetworkUtility {
 
     private static final String TAG = NetworkUtility.class.getSimpleName();
     private static final String BASE_URL = "https://api.themoviedb.org/3/movie/";
-    //private static final String POPULAR = "http://api.themoviedb.org/3/movie/popular";
-    //private static final String TOP_RATED = "https://api.themoviedb.org/3/movie/top_rated";
-    //private static String trailers = "https://api.themoviedb.org/3/movie/"
 
     private final static String API_PARAM = "api_key";
     private final static String TRAILER_KW = "/videos";
@@ -63,8 +60,6 @@ public class NetworkUtility {
             e.printStackTrace();
         }
 
-        //Log.v(TAG, "Built URI " + builtURL);
-
         return builtURL;
     }
 
@@ -92,7 +87,7 @@ public class NetworkUtility {
             e.printStackTrace();
         }
 
-        Log.v(TAG, "Built URI = " + builtURL);
+        //Log.v(TAG, "Built URI = " + builtURL);
 
         return builtURL;
     }

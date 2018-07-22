@@ -5,8 +5,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Typeface;
-import android.net.Network;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
@@ -15,7 +13,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -52,7 +49,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_details);
 
-        //Creates the back arrow on the top left corner to return to MainActivity
+        //Creates the back arrow on the top left corner to return to MainActivity, DELETE PARENT?
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
@@ -78,7 +75,6 @@ public class MovieDetailsActivity extends AppCompatActivity {
         plotSynopsis.setText(m.getPlotSynopsis());
         releaseDate.setText(m.getReleaseDate());
 
-        //Log.v("MDA: ", "id= " + m.getId());
         FavoriteDbHelper dbHelper = new FavoriteDbHelper(this);
         mDb = dbHelper.getWritableDatabase();
 
@@ -86,7 +82,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
     }
 
     private class GetOperation extends AsyncTask<Integer, Void, ArrayList<String>> {
-        ProgressDialog progressDialog;
+        final ProgressDialog progressDialog;
         Context context;
 
         private GetOperation(Context c){
@@ -126,8 +122,6 @@ public class MovieDetailsActivity extends AppCompatActivity {
                 ArrayList<String> reviewData = parseReviewsString(jsonUserResponse);
                 trailers = parseTrailersString(jsonTrailerResponse);
 
-                Log.v("MDA.java: ", "json = " + jsonTrailerResponse);
-
                 return reviewData;
             } catch (Exception e) {
                 e.printStackTrace();
@@ -151,7 +145,6 @@ public class MovieDetailsActivity extends AppCompatActivity {
                     final String key = trailers.get(name);
 
                     ImageButton b = new ImageButton(context);
-                    //b.setText(name);
                     b.setBackgroundResource(R.drawable.ic_play);
                     b.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -198,13 +191,15 @@ public class MovieDetailsActivity extends AppCompatActivity {
         if(id == android.R.id.home) {
             finish();
         } else if (id == R.id.action_favorite) {
+            Toast.makeText(this,"Added to favorites!", Toast.LENGTH_LONG).show();
+            addToFavorites();
             return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
-    public ArrayList<String> parseReviewsString(String json) throws JSONException{
+    private ArrayList<String> parseReviewsString(String json) throws JSONException{
 
         JSONObject reviews = new JSONObject(json);
         JSONArray results = reviews.getJSONArray("results");
@@ -226,7 +221,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
         return parsedReviewData;
     }
 
-    public HashMap<String, String> parseTrailersString(String json) throws JSONException{
+    private HashMap<String, String> parseTrailersString(String json) throws JSONException{
 
         JSONObject reviews = new JSONObject(json);
         JSONArray results = reviews.getJSONArray("results");
@@ -247,18 +242,20 @@ public class MovieDetailsActivity extends AppCompatActivity {
         return parsedTrailerData;
     }
 
-    public long addToFavorites() {
+    private long addToFavorites() {
         if (m.getTitle() == null) {
             return 0;
         }
 
-        String title = m.getTitle();
-        int id = m.getId();
-
         ContentValues cv = new ContentValues();
 
-        cv.put(FavoriteContract.FavoriteEntry.COLUMN_MOVIE_NAME, title);
-        cv.put(FavoriteContract.FavoriteEntry.COLUMN_MOVIE_ID, id);
+        cv.put(FavoriteContract.FavoriteEntry.COLUMN_MOVIE_ID, m.getId());
+        cv.put(FavoriteContract.FavoriteEntry.COLUMN_MOVIE_NAME, m.getTitle());
+        cv.put(FavoriteContract.FavoriteEntry.COLUMN_IMAGE, m.getImage());
+        cv.put(FavoriteContract.FavoriteEntry.COLUMN_RELEASE_DATE, m.getReleaseDate());
+        cv.put(FavoriteContract.FavoriteEntry.COLUMN_VOTE_AVERAGE, m.getVoteAverage());
+        cv.put(FavoriteContract.FavoriteEntry.COLUMN_PLOT_SYNOPSIS, m.getPlotSynopsis());
+        cv.put(FavoriteContract.FavoriteEntry.COLUMN_BACKDROP, m.getBackDrop());
 
         return mDb.insert(FavoriteContract.FavoriteEntry.TABLE_NAME, null, cv);
     }
