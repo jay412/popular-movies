@@ -4,7 +4,9 @@ import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
@@ -191,8 +193,20 @@ public class MovieDetailsActivity extends AppCompatActivity {
         if(id == android.R.id.home) {
             finish();
         } else if (id == R.id.action_favorite) {
-            Toast.makeText(this,"Added to favorites!", Toast.LENGTH_LONG).show();
-            addToFavorites();
+            //check to see which msg to display in case of duplicate favorite movies
+            Boolean showMsg = true;
+            try {
+                addToFavorites();
+            } catch (SQLiteException exception) {
+                showMsg = false;
+                Toast.makeText(this,"Already added to favorites! Go to My Favorites to remove it!", Toast.LENGTH_LONG).show();
+                //Log.v("SQLite", "Error " + exception.toString());
+                //exception.printStackTrace();
+            }
+
+            if(showMsg)
+                Toast.makeText(this,"Added to favorites!", Toast.LENGTH_LONG).show();
+
             return true;
         }
 
@@ -249,7 +263,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
 
         ContentValues cv = new ContentValues();
 
-        cv.put(FavoriteContract.FavoriteEntry.COLUMN_MOVIE_ID, m.getId());
+        cv.put(FavoriteContract.FavoriteEntry._ID, m.getId());
         cv.put(FavoriteContract.FavoriteEntry.COLUMN_MOVIE_NAME, m.getTitle());
         cv.put(FavoriteContract.FavoriteEntry.COLUMN_IMAGE, m.getImage());
         cv.put(FavoriteContract.FavoriteEntry.COLUMN_RELEASE_DATE, m.getReleaseDate());
@@ -257,6 +271,6 @@ public class MovieDetailsActivity extends AppCompatActivity {
         cv.put(FavoriteContract.FavoriteEntry.COLUMN_PLOT_SYNOPSIS, m.getPlotSynopsis());
         cv.put(FavoriteContract.FavoriteEntry.COLUMN_BACKDROP, m.getBackDrop());
 
-        return mDb.insert(FavoriteContract.FavoriteEntry.TABLE_NAME, null, cv);
+        return mDb.insertOrThrow(FavoriteContract.FavoriteEntry.TABLE_NAME, null, cv);
     }
 }

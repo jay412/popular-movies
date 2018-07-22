@@ -64,7 +64,7 @@ public class FavoriteAdapter extends BaseAdapter{
         Double voteAverage = mCursor.getDouble(mCursor.getColumnIndex(FavoriteContract.FavoriteEntry.COLUMN_VOTE_AVERAGE));
         String plotSynopsis = mCursor.getString(mCursor.getColumnIndex(FavoriteContract.FavoriteEntry.COLUMN_PLOT_SYNOPSIS));
         String backdrop = mCursor.getString(mCursor.getColumnIndex(FavoriteContract.FavoriteEntry.COLUMN_BACKDROP));
-        int id = mCursor.getInt(mCursor.getColumnIndex(FavoriteContract.FavoriteEntry.COLUMN_MOVIE_ID));
+        int id = mCursor.getInt(mCursor.getColumnIndex(FavoriteContract.FavoriteEntry._ID));
 
         ImageView movieView = convertView.findViewById(R.id.movie_image);
         Picasso.with(currentActivity).load(Movie.setPicSize(image, "home")).into(movieView);
