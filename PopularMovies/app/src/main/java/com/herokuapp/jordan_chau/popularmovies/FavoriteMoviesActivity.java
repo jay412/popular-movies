@@ -15,6 +15,7 @@ public class FavoriteMoviesActivity extends AppCompatActivity {
     private SQLiteDatabase mDb;
     private FavoriteAdapter mAdapter;
     private GridView mGrid;
+    private FavoriteDbHelper mDbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,15 +30,28 @@ public class FavoriteMoviesActivity extends AppCompatActivity {
 
         mGrid = findViewById(R.id.fgrid);
 
-        FavoriteDbHelper dbHelper = new FavoriteDbHelper(this);
-        mDb = dbHelper.getReadableDatabase();
+        mDbHelper = new FavoriteDbHelper(this);
+        mDb = mDbHelper.getReadableDatabase();
         //get data
-        Cursor cursor = getAllFavoriteMovie();
-        mAdapter = new FavoriteAdapter(this, cursor);
+        Cursor mCursor = getAllFavoriteMovie();
+        mAdapter = new FavoriteAdapter(this, mCursor);
         mGrid.setAdapter(mAdapter);
     }
 
-    private Cursor getAllFavoriteMovie() {
+    @Override
+    protected void onResume() {
+        //refresh favorite movies when activity is resumed
+        mAdapter.swapCursor(getAllFavoriteMovie());
+        super.onResume();
+    }
+
+    @Override
+    protected void onDestroy() {
+        mDbHelper.close();
+        super.onDestroy();
+    }
+
+    public Cursor getAllFavoriteMovie() {
         return mDb.query(
                 FavoriteContract.FavoriteEntry.TABLE_NAME,
                 null,

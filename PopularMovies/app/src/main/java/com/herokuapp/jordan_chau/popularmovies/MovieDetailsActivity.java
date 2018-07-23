@@ -4,7 +4,6 @@ import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.net.Uri;
@@ -41,6 +40,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
     private LinearLayout trailerLayout;
 
     private SQLiteDatabase mDb;
+    private FavoriteDbHelper mDbHelper;
 
     private Movie m;
 
@@ -77,12 +77,14 @@ public class MovieDetailsActivity extends AppCompatActivity {
         plotSynopsis.setText(m.getPlotSynopsis());
         releaseDate.setText(m.getReleaseDate());
 
-        FavoriteDbHelper dbHelper = new FavoriteDbHelper(this);
-        mDb = dbHelper.getWritableDatabase();
+        //database stuff
+        mDbHelper = new FavoriteDbHelper(this);
+        mDb = mDbHelper.getWritableDatabase();
 
         new GetOperation(this).execute(m.getId());
     }
 
+    //change name in future
     private class GetOperation extends AsyncTask<Integer, Void, ArrayList<String>> {
         final ProgressDialog progressDialog;
         Context context;
@@ -98,7 +100,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
             if(!NetworkUtility.checkInternetConnection(context)) {
                 this.cancel(true);
                 Toast.makeText(context,"Please check your internet connection and try again.", Toast.LENGTH_LONG).show();
-                Log.v("MAF.java: ", "NO WIFI");
+                //Log.v("MAF.java: ", "NO WIFI");
             }
             else {
                 super.onPreExecute();
@@ -133,6 +135,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(ArrayList<String> rData) {
+            //format reviews and add to textview --> make into method later
             if (rData != null) {
                 String reviewText = "";
                 for (int x = 0; x < rData.size(); ++x) {
@@ -142,7 +145,8 @@ public class MovieDetailsActivity extends AppCompatActivity {
                 reviews.setText(reviewText);
             }
 
-            if(trailers != null) {
+            //add button and trailer name to layout --> make into method later
+            if (trailers != null) {
                 for (String name : trailers.keySet()) {
                     final String key = trailers.get(name);
 
@@ -192,6 +196,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
         // handles back arrow presses
         if(id == android.R.id.home) {
             finish();
+            //handle favorite star presses
         } else if (id == R.id.action_favorite) {
             //check to see which msg to display in case of duplicate favorite movies
             Boolean showMsg = true;
@@ -199,7 +204,8 @@ public class MovieDetailsActivity extends AppCompatActivity {
                 addToFavorites();
             } catch (SQLiteException exception) {
                 showMsg = false;
-                Toast.makeText(this,"Already added to favorites! Go to My Favorites to remove it!", Toast.LENGTH_LONG).show();
+                removeFromFavorites();
+                Toast.makeText(this,"Removed from favorites!", Toast.LENGTH_LONG).show();
                 //Log.v("SQLite", "Error " + exception.toString());
                 //exception.printStackTrace();
             }
@@ -272,5 +278,15 @@ public class MovieDetailsActivity extends AppCompatActivity {
         cv.put(FavoriteContract.FavoriteEntry.COLUMN_BACKDROP, m.getBackDrop());
 
         return mDb.insertOrThrow(FavoriteContract.FavoriteEntry.TABLE_NAME, null, cv);
+    }
+
+    private boolean removeFromFavorites() {
+        return mDb.delete(FavoriteContract.FavoriteEntry.TABLE_NAME, FavoriteContract.FavoriteEntry._ID + "=" + m.getId(), null) > 0;
+    }
+
+    @Override
+    protected void onDestroy() {
+        mDbHelper.close();
+        super.onDestroy();
     }
 }
