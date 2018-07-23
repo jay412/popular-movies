@@ -24,6 +24,11 @@
         <activity
             android:name=".FavoriteMoviesActivity"
             android:parentActivityName=".MainActivity"></activity>
+
+        <provider
+            android:name="com.herokuapp.jordan_chau.popularmovies.provider.MovieContentProvider"
+            android:authorities="com.herokuapp.jordan_chau.popularmovies"
+            android:exported="false" />
     </application>
 
 </manifest>

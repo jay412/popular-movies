@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -31,7 +32,7 @@ public class MainActivityFragment extends Fragment {
     public MainActivityFragment() { }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
         //allows fragment to handle options menu
         setHasOptionsMenu(true);
@@ -81,9 +82,8 @@ public class MainActivityFragment extends Fragment {
 
             try {
                 String jsonUserResponse = NetworkUtility.getHttpUrlResponse(movieRequestUrl);
-                ArrayList<Movie> movieData = getMovieStringsFromJson(jsonUserResponse);
 
-                return movieData;
+                return getMovieStringsFromJson(jsonUserResponse);
             } catch (Exception e) {
                 e.printStackTrace();
                 return null;

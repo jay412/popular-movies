@@ -4,7 +4,6 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
-import android.util.Log;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,7 +22,7 @@ import java.util.Scanner;
  */
 public class NetworkUtility {
 
-    private static final String TAG = NetworkUtility.class.getSimpleName();
+    //private static final String TAG = NetworkUtility.class.getSimpleName();
     private static final String BASE_URL = "https://api.themoviedb.org/3/movie/";
 
     private final static String API_PARAM = "api_key";

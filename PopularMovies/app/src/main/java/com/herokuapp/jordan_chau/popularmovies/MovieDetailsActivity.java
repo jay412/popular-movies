@@ -4,12 +4,11 @@ import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -21,7 +20,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.herokuapp.jordan_chau.popularmovies.database.FavoriteContract;
-import com.herokuapp.jordan_chau.popularmovies.database.FavoriteDbHelper;
 import com.herokuapp.jordan_chau.popularmovies.models.Movie;
 import com.herokuapp.jordan_chau.popularmovies.utils.NetworkUtility;
 import com.squareup.picasso.Picasso;
@@ -38,9 +36,6 @@ public class MovieDetailsActivity extends AppCompatActivity {
     private TextView reviews;
     private HashMap<String, String> trailers;
     private LinearLayout trailerLayout;
-
-    private SQLiteDatabase mDb;
-    private FavoriteDbHelper mDbHelper;
 
     private Movie m;
 
@@ -71,15 +66,11 @@ public class MovieDetailsActivity extends AppCompatActivity {
         m = intent.getParcelableExtra("movie");
         setTitle(m.getTitle());
 
-        Picasso.with(this).load(m.setPicSize(m.getImage(), "detail")).into(image);
-        Picasso.with(this).load(m.setPicSize(m.getBackDrop(), "backdrop")).into(backDrop);
+        Picasso.with(this).load(Movie.setPicSize(m.getImage(), "detail")).into(image);
+        Picasso.with(this).load(Movie.setPicSize(m.getBackDrop(), "backdrop")).into(backDrop);
         voteAverage.setText(m.getVoteAverage().toString().concat("/10"));
         plotSynopsis.setText(m.getPlotSynopsis());
         releaseDate.setText(m.getReleaseDate());
-
-        //database stuff
-        mDbHelper = new FavoriteDbHelper(this);
-        mDb = mDbHelper.getWritableDatabase();
 
         new GetOperation(this).execute(m.getId());
     }
@@ -87,7 +78,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
     //change name in future
     private class GetOperation extends AsyncTask<Integer, Void, ArrayList<String>> {
         final ProgressDialog progressDialog;
-        Context context;
+        final Context context;
 
         private GetOperation(Context c){
             context = c;
@@ -100,7 +91,6 @@ public class MovieDetailsActivity extends AppCompatActivity {
             if(!NetworkUtility.checkInternetConnection(context)) {
                 this.cancel(true);
                 Toast.makeText(context,"Please check your internet connection and try again.", Toast.LENGTH_LONG).show();
-                //Log.v("MAF.java: ", "NO WIFI");
             }
             else {
                 super.onPreExecute();
@@ -137,12 +127,12 @@ public class MovieDetailsActivity extends AppCompatActivity {
         protected void onPostExecute(ArrayList<String> rData) {
             //format reviews and add to textview --> make into method later
             if (rData != null) {
-                String reviewText = "";
+                StringBuilder reviewText = new StringBuilder();
                 for (int x = 0; x < rData.size(); ++x) {
-                    reviewText += rData.get(x) + "\n\n";
+                    reviewText.append(rData.get(x)).append("\n\n");
                 }
 
-                reviews.setText(reviewText);
+                reviews.setText(reviewText.toString());
             }
 
             //add button and trailer name to layout --> make into method later
@@ -200,14 +190,13 @@ public class MovieDetailsActivity extends AppCompatActivity {
         } else if (id == R.id.action_favorite) {
             //check to see which msg to display in case of duplicate favorite movies
             Boolean showMsg = true;
+
             try {
                 addToFavorites();
             } catch (SQLiteException exception) {
                 showMsg = false;
                 removeFromFavorites();
                 Toast.makeText(this,"Removed from favorites!", Toast.LENGTH_LONG).show();
-                //Log.v("SQLite", "Error " + exception.toString());
-                //exception.printStackTrace();
             }
 
             if(showMsg)
@@ -262,9 +251,9 @@ public class MovieDetailsActivity extends AppCompatActivity {
         return parsedTrailerData;
     }
 
-    private long addToFavorites() {
+    private void addToFavorites() {
         if (m.getTitle() == null) {
-            return 0;
+            return;
         }
 
         ContentValues cv = new ContentValues();
@@ -277,16 +266,20 @@ public class MovieDetailsActivity extends AppCompatActivity {
         cv.put(FavoriteContract.FavoriteEntry.COLUMN_PLOT_SYNOPSIS, m.getPlotSynopsis());
         cv.put(FavoriteContract.FavoriteEntry.COLUMN_BACKDROP, m.getBackDrop());
 
-        return mDb.insertOrThrow(FavoriteContract.FavoriteEntry.TABLE_NAME, null, cv);
+        getContentResolver().insert(FavoriteContract.FavoriteEntry.CONTENT_URI, cv);
     }
 
-    private boolean removeFromFavorites() {
-        return mDb.delete(FavoriteContract.FavoriteEntry.TABLE_NAME, FavoriteContract.FavoriteEntry._ID + "=" + m.getId(), null) > 0;
+    private void removeFromFavorites() {
+        String stringId = Integer.toString(m.getId());
+        Uri uri = FavoriteContract.FavoriteEntry.CONTENT_URI;
+        uri = uri.buildUpon().appendPath(stringId).build();
+
+        getContentResolver().delete(uri, null, null);
     }
 
-    @Override
+    /*@Override
     protected void onDestroy() {
         mDbHelper.close();
         super.onDestroy();
-    }
+    } */
 }

@@ -18,7 +18,6 @@ public class FavoriteDbHelper extends SQLiteOpenHelper{
         final String SQL_CREATE_FAVORITE_TABLE = "CREATE TABLE " +
                 FavoriteContract.FavoriteEntry.TABLE_NAME + " (" +
                 FavoriteContract.FavoriteEntry._ID + " INTEGER PRIMARY KEY," +
-                //FavoriteContract.FavoriteEntry.COLUMN_MOVIE_ID + " INTEGER NOT NULL," +
                 FavoriteContract.FavoriteEntry.COLUMN_MOVIE_NAME + " TEXT NOT NULL," +
                 FavoriteContract.FavoriteEntry.COLUMN_IMAGE + " TEXT NOT NULL," +
                 FavoriteContract.FavoriteEntry.COLUMN_RELEASE_DATE + " TEXT NOT NULL," +

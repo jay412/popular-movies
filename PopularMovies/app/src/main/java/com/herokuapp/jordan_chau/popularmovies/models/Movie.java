@@ -7,7 +7,7 @@ public class Movie implements Parcelable{
     private String movieName, image, releaseDate, plotSynopsis, backDrop;
     private Double voteAverage;
     private int id;
-    private static final String BASE_URL = "http://image.tmdb.org/t/p/w185/";
+    private static final String BASE_URL = "http://image.tmdb.org/t/p/w342/";
     private static final String DETAIL_URL = "http://image.tmdb.org/t/p/w500/";
     private static final String BACKDROP_URL = "http://image.tmdb.org/t/p/w780/";
 

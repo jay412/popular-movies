@@ -5,14 +5,11 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.text.Layout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.herokuapp.jordan_chau.popularmovies.MovieDetailsActivity;
 import com.herokuapp.jordan_chau.popularmovies.R;
@@ -20,11 +17,9 @@ import com.herokuapp.jordan_chau.popularmovies.database.FavoriteContract;
 import com.herokuapp.jordan_chau.popularmovies.models.Movie;
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
-
 public class FavoriteAdapter extends BaseAdapter{
 
-    private Activity currentActivity;
+    private final Activity currentActivity;
     private Cursor mCursor;
 
     public FavoriteAdapter(Activity context, Cursor cursor) {
@@ -34,6 +29,9 @@ public class FavoriteAdapter extends BaseAdapter{
 
     @Override
     public int getCount() {
+        if(mCursor == null) {
+            return 0;
+        }
         return mCursor.getCount();
     }
 
@@ -86,8 +84,9 @@ public class FavoriteAdapter extends BaseAdapter{
     }
 
     public void swapCursor(Cursor newCursor) {
-        if (mCursor != null) {
-            mCursor.close();
+
+        if (mCursor == newCursor) {
+            return; //same cursor
         }
 
         mCursor = newCursor;
