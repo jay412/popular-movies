@@ -34,6 +34,7 @@ import java.util.HashMap;
 
 public class MovieDetailsActivity extends AppCompatActivity {
     private TextView reviews;
+
     private HashMap<String, String> trailers;
     private LinearLayout trailerLayout;
 
@@ -198,13 +199,15 @@ public class MovieDetailsActivity extends AppCompatActivity {
                 removeFromFavorites();
                 Toast.makeText(this,"Removed from favorites!", Toast.LENGTH_LONG).show();
                 item.setIcon(R.drawable.ic_empty_star);
+
+                Log.v("MDA: ", "SQLiteException = " + exception);
+                exception.getStackTrace();
             }
 
             if(showMsg) {
                 Toast.makeText(this,"Added to favorites!", Toast.LENGTH_LONG).show();
                 item.setIcon(R.drawable.ic_green_star);
             }
-
 
             return true;
         }

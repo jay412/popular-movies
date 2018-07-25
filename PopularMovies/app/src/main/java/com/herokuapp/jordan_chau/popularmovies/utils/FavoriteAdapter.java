@@ -85,7 +85,7 @@ public class FavoriteAdapter extends BaseAdapter{
 
     public void swapCursor(Cursor newCursor) {
 
-        if (mCursor == newCursor) {
+        if (mCursor == newCursor || newCursor == null) {
             return; //same cursor
         }
 

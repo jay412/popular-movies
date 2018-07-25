@@ -31,14 +31,18 @@ public class MainActivityFragment extends Fragment {
 
     private GridView gridView;
     private static final String API_KEY = BuildConfig.API_KEY;
-    private String sortOrder;
-    private int mCurrentPosition;
 
+    //adapters
     private MovieAdapter movieAdapter;
     private FavoriteAdapter mAdapter;
 
+    //for saved instance
+    private String sortOrder;
+    private int mCurrentPosition;
     public static final String SORT_ORDER = "sort_order";
     public static final String GRID_POSITION = "grid_position";
+
+    //for loader
     private static final int FAVORITE_LOADER_ID = 0;
 
     public MainActivityFragment() { }
@@ -54,22 +58,31 @@ public class MainActivityFragment extends Fragment {
 
         if(savedInstanceState != null) {
             //save sort order
-            if(movieAdapter != null) {
+            sortOrder = savedInstanceState.getString(SORT_ORDER);
+
+            if (sortOrder.equals("popular")) {
+                getActivity().setTitle("Most Popular");
+                if(movieAdapter != null)
+                    gridView.setAdapter(movieAdapter);
+                else
+                    new GetOperation().execute(API_KEY, sortOrder);
+
+            } else if(movieAdapter != null && sortOrder.equals("top_rated")) {
+                getActivity().setTitle("Top Rated");
                 gridView.setAdapter(movieAdapter);
-            } else {
-                sortOrder = savedInstanceState.getString(SORT_ORDER);
-                new GetOperation().execute(API_KEY, sortOrder);
+
+            } else if(mAdapter != null && sortOrder.equals("my_favorites")) {
+                getActivity().setTitle("My Favorites");
+                //getActivity().getSupportLoaderManager().restartLoader(FAVORITE_LOADER_ID, null, new FavoriteLoaderManager(getActivity(), mAdapter));
+                gridView.setAdapter(mAdapter);
             }
 
-            if (sortOrder.equals("popular")){
-                getActivity().setTitle("Most Popular");
-            } else {
-                getActivity().setTitle("Top Rated");
+            else if (sortOrder != null) {
+                new GetOperation().execute(API_KEY, sortOrder);
             }
 
             //move to previous position in gridview
             mCurrentPosition = savedInstanceState.getInt(GRID_POSITION);
-            Log.v("MAF: ", "saved position = " + mCurrentPosition);
             gridView.setSelection(mCurrentPosition);
         } else {
             getActivity().setTitle("Most Popular");
@@ -80,7 +93,6 @@ public class MainActivityFragment extends Fragment {
 
             //places api key in the execute parameter, popular is default sort order
             new GetOperation().execute(API_KEY, "popular");
-
         }
 
         return rootView;
@@ -196,6 +208,8 @@ public class MainActivityFragment extends Fragment {
 
             case R.id.favorites:
                 getActivity().setTitle("My Favorites");
+                sortOrder = "my_favorites";
+                getActivity().getSupportLoaderManager().restartLoader(FAVORITE_LOADER_ID, null, new FavoriteLoaderManager(getActivity(), mAdapter));
                 gridView.setAdapter(mAdapter);
                 return true;
 
