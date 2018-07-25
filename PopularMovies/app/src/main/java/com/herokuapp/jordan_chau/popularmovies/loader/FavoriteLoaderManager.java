@@ -1,5 +1,6 @@
-package com.herokuapp.jordan_chau.popularmovies;
+package com.herokuapp.jordan_chau.popularmovies.loader;
 
+import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -7,42 +8,25 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.widget.GridView;
 
 import com.herokuapp.jordan_chau.popularmovies.database.FavoriteContract;
 import com.herokuapp.jordan_chau.popularmovies.utils.FavoriteAdapter;
 
-public class FavoriteMoviesActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+public class FavoriteLoaderManager implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private FavoriteAdapter mAdapter;
+    private Context context;
 
-    private static final int FAVORITE_LOADER_ID = 0;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_favorite_movies);
-
-        setTitle("My Favorites");
-
-        //Creates the back arrow on the top left corner to return to MainActivity
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
-
-        GridView mGrid = findViewById(R.id.fgrid);
-        //initialize and get data
-        mAdapter = new FavoriteAdapter(this, null);
-
-        getSupportLoaderManager().initLoader(FAVORITE_LOADER_ID, null, this);
-        mGrid.setAdapter(mAdapter);
+    public FavoriteLoaderManager(Context c, FavoriteAdapter fa) {
+        context = c;
+        mAdapter = fa;
     }
 
     @NonNull
     @Override
     public Loader<Cursor> onCreateLoader(int id, @Nullable Bundle args) {
-        return new AsyncTaskLoader<Cursor>(this) {
+        return new AsyncTaskLoader<Cursor>(context) {
 
             Cursor mTaskData = null;
 
@@ -82,30 +66,16 @@ public class FavoriteMoviesActivity extends AppCompatActivity implements LoaderM
         mAdapter.swapCursor(null);
     }
 
-    @Override
-    protected void onResume() {
-        //refresh favorite movies when activity is resumed
-        getSupportLoaderManager().restartLoader(FAVORITE_LOADER_ID, null, this);
-        super.onResume();
-    }
-
-    /*@Override
-    protected void onDestroy() {
-        mDbHelper.close();
-        super.onDestroy();
-    } */
-
-
     private Cursor getAllFavoriteMovie() {
         try {
-            return getContentResolver().query(FavoriteContract.FavoriteEntry.CONTENT_URI,
+            return context.getContentResolver().query(FavoriteContract.FavoriteEntry.CONTENT_URI,
                     null,
                     null,
                     null,
                     FavoriteContract.FavoriteEntry.COLUMN_TIMESTAMP);
         } catch (Exception e) {
-            Log.e("FMA: ", "Failed to asynchronously load data.");
-            e.printStackTrace();
+            //Log.e("FMA: ", "Failed to asynchronously load data.");
+            //e.printStackTrace();
             return null;
         }
     }

@@ -6,6 +6,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -13,7 +14,9 @@ import android.view.ViewGroup;
 import android.widget.GridView;
 import android.widget.Toast;
 
+import com.herokuapp.jordan_chau.popularmovies.loader.FavoriteLoaderManager;
 import com.herokuapp.jordan_chau.popularmovies.models.Movie;
+import com.herokuapp.jordan_chau.popularmovies.utils.FavoriteAdapter;
 import com.herokuapp.jordan_chau.popularmovies.utils.MovieAdapter;
 import com.herokuapp.jordan_chau.popularmovies.utils.NetworkUtility;
 
@@ -28,6 +31,15 @@ public class MainActivityFragment extends Fragment {
 
     private GridView gridView;
     private static final String API_KEY = BuildConfig.API_KEY;
+    private String sortOrder;
+    private int mCurrentPosition;
+
+    private MovieAdapter movieAdapter;
+    private FavoriteAdapter mAdapter;
+
+    public static final String SORT_ORDER = "sort_order";
+    public static final String GRID_POSITION = "grid_position";
+    private static final int FAVORITE_LOADER_ID = 0;
 
     public MainActivityFragment() { }
 
@@ -37,12 +49,39 @@ public class MainActivityFragment extends Fragment {
         //allows fragment to handle options menu
         setHasOptionsMenu(true);
 
-        getActivity().setTitle("Most Popular");
         // Get a reference to the ListView, and attach this adapter to it.
         gridView = rootView.findViewById(R.id.grid);
 
-        //places api key in the execute parameter, popular is default sort order
-        new GetOperation().execute(API_KEY, "popular");
+        if(savedInstanceState != null) {
+            //save sort order
+            if(movieAdapter != null) {
+                gridView.setAdapter(movieAdapter);
+            } else {
+                sortOrder = savedInstanceState.getString(SORT_ORDER);
+                new GetOperation().execute(API_KEY, sortOrder);
+            }
+
+            if (sortOrder.equals("popular")){
+                getActivity().setTitle("Most Popular");
+            } else {
+                getActivity().setTitle("Top Rated");
+            }
+
+            //move to previous position in gridview
+            mCurrentPosition = savedInstanceState.getInt(GRID_POSITION);
+            Log.v("MAF: ", "saved position = " + mCurrentPosition);
+            gridView.setSelection(mCurrentPosition);
+        } else {
+            getActivity().setTitle("Most Popular");
+
+            //favorites loader
+            mAdapter = new FavoriteAdapter(getActivity(), null);
+            getActivity().getSupportLoaderManager().initLoader(FAVORITE_LOADER_ID, null, new FavoriteLoaderManager(getActivity(), mAdapter));
+
+            //places api key in the execute parameter, popular is default sort order
+            new GetOperation().execute(API_KEY, "popular");
+
+        }
 
         return rootView;
     }
@@ -78,7 +117,8 @@ public class MainActivityFragment extends Fragment {
             }
 
             String api_key = params[0];
-            URL movieRequestUrl = NetworkUtility.buildURL(api_key, params[1]);
+            sortOrder = params[1];
+            URL movieRequestUrl = NetworkUtility.buildURL(api_key, sortOrder);
 
             try {
                 String jsonUserResponse = NetworkUtility.getHttpUrlResponse(movieRequestUrl);
@@ -95,7 +135,7 @@ public class MainActivityFragment extends Fragment {
             progressDialog.dismiss();
 
             if(mData != null) {
-                MovieAdapter movieAdapter = new MovieAdapter(getActivity(), mData);
+                movieAdapter = new MovieAdapter(getActivity(), mData);
                 gridView.setAdapter(movieAdapter);
             } else {
                 showErrorMessage();
@@ -141,20 +181,46 @@ public class MainActivityFragment extends Fragment {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         switch (item.getItemId()) {
+
             case R.id.most_popular:
+                getActivity().setTitle("Most Popular");
+                gridView.setAdapter(movieAdapter);
                 new GetOperation().execute(API_KEY, "popular");
-                    getActivity().setTitle("Most Popular");
                 return true;
+
             case R.id.top_rated:
-                new GetOperation().execute(API_KEY, "top_rated");
                 getActivity().setTitle("Top Rated");
+                gridView.setAdapter(movieAdapter);
+                new GetOperation().execute(API_KEY, "top_rated");
                 return true;
+
             case R.id.favorites:
-                Intent i = new Intent(getActivity(), FavoriteMoviesActivity.class);
-                getActivity().startActivity(i);
+                getActivity().setTitle("My Favorites");
+                gridView.setAdapter(mAdapter);
                 return true;
+
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    //save grid position and sort order when device is rotated
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        int position = gridView.getFirstVisiblePosition();
+
+        outState.putString(SORT_ORDER, sortOrder);
+        outState.putInt(GRID_POSITION, position);
+
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onResume() {
+        //refresh favorite movies when activity is resumed if cursor is not null
+        if(mAdapter != null && mAdapter.getCursor() != null)
+            getActivity().getSupportLoaderManager().restartLoader(FAVORITE_LOADER_ID, null, new FavoriteLoaderManager(getActivity(), mAdapter));
+
+        super.onResume();
     }
 }

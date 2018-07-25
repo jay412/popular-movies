@@ -197,10 +197,14 @@ public class MovieDetailsActivity extends AppCompatActivity {
                 showMsg = false;
                 removeFromFavorites();
                 Toast.makeText(this,"Removed from favorites!", Toast.LENGTH_LONG).show();
+                item.setIcon(R.drawable.ic_empty_star);
             }
 
-            if(showMsg)
+            if(showMsg) {
                 Toast.makeText(this,"Added to favorites!", Toast.LENGTH_LONG).show();
+                item.setIcon(R.drawable.ic_green_star);
+            }
+
 
             return true;
         }

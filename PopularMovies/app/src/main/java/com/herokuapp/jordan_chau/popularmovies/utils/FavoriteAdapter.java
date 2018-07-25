@@ -95,4 +95,8 @@ public class FavoriteAdapter extends BaseAdapter{
             this.notifyDataSetChanged();
         }
     }
+
+    public Cursor getCursor(){
+        return mCursor;
+    }
 }
