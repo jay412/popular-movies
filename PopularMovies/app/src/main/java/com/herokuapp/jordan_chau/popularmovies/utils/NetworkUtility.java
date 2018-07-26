@@ -4,6 +4,8 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.support.design.widget.Snackbar;
+import android.view.View;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -123,5 +125,11 @@ public class NetworkUtility {
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
 
         return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+    }
+
+    public static void showErrorMessage(View v) {
+        //Toast.makeText(getActivity(),"Please check your internet connection and try again.", Toast.LENGTH_LONG).show();
+        Snackbar snackbar = Snackbar.make(v, "Please check your internet connection and try again.", Snackbar.LENGTH_LONG);
+        snackbar.show();
     }
 }

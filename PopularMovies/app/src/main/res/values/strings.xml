@@ -17,4 +17,7 @@
     <string name="movie_image_desc">movie image</string>
     <string name="movie_detail_img_desc">bigger movie image</string>
     <string name="movie_backdrop_img_desc">movie backdrop image</string>
+
+    <!-- dummy text for layout -->
+    <string name="dummy">Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. </string>
 </resources>

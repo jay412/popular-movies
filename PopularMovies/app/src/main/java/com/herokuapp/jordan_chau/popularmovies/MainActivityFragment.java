@@ -1,18 +1,15 @@
 package com.herokuapp.jordan_chau.popularmovies;
 
 import android.app.ProgressDialog;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridView;
-import android.widget.Toast;
 
 import com.herokuapp.jordan_chau.popularmovies.loader.FavoriteLoaderManager;
 import com.herokuapp.jordan_chau.popularmovies.models.Movie;
@@ -38,9 +35,8 @@ public class MainActivityFragment extends Fragment {
 
     //for saved instance
     private String sortOrder;
-    private int mCurrentPosition;
-    public static final String SORT_ORDER = "sort_order";
-    public static final String GRID_POSITION = "grid_position";
+    private static final String SORT_ORDER = "sort_order";
+    private static final String GRID_POSITION = "grid_position";
 
     //for loader
     private static final int FAVORITE_LOADER_ID = 0;
@@ -77,7 +73,7 @@ public class MainActivityFragment extends Fragment {
             } 
 
             //move to previous position in gridview
-            mCurrentPosition = savedInstanceState.getInt(GRID_POSITION);
+            int mCurrentPosition = savedInstanceState.getInt(GRID_POSITION);
             gridView.setSelection(mCurrentPosition);
         } else {
 
@@ -109,7 +105,7 @@ public class MainActivityFragment extends Fragment {
             //checks for internet connection before proceeding
             if(!NetworkUtility.checkInternetConnection(getActivity())) {
                 this.cancel(true);
-                showErrorMessage();
+                NetworkUtility.showErrorMessage(gridView);
             }
             else {
                 super.onPreExecute();
@@ -147,13 +143,9 @@ public class MainActivityFragment extends Fragment {
                 movieAdapter = new MovieAdapter(getActivity(), mData);
                 gridView.setAdapter(movieAdapter);
             } else {
-                showErrorMessage();
+                NetworkUtility.showErrorMessage(gridView);
             }
         }
-    }
-
-    private void showErrorMessage() {
-        Toast.makeText(getActivity(),"Please check your internet connection and try again.", Toast.LENGTH_LONG).show();
     }
 
     private ArrayList<Movie> getMovieStringsFromJson(String json) throws JSONException {

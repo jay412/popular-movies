@@ -65,7 +65,11 @@ public class FavoriteAdapter extends BaseAdapter{
         int id = mCursor.getInt(mCursor.getColumnIndex(FavoriteContract.FavoriteEntry._ID));
 
         ImageView movieView = convertView.findViewById(R.id.movie_image);
-        Picasso.with(currentActivity).load(Movie.setPicSize(image, "home")).into(movieView);
+        Picasso.with(currentActivity)
+                .load(Movie.setPicSize(image, "home"))
+                .placeholder(R.drawable.gif_loading_blue)
+                .error(R.drawable.ic_error_loading)
+                .into(movieView);
 
         setImageOnClickListener(movieView, new Movie(title, image, releaseDate, voteAverage, plotSynopsis,backdrop, id));
 

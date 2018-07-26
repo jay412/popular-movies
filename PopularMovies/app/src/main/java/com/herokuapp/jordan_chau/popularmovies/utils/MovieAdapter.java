@@ -36,7 +36,11 @@ public class MovieAdapter extends ArrayAdapter<Movie>{
         }
 
         ImageView movieView = convertView.findViewById(R.id.movie_image);
-        Picasso.with(this.getContext()).load(Movie.setPicSize(movie.getImage(), "home")).into(movieView);
+        Picasso.with(this.getContext())
+                .load(Movie.setPicSize(movie.getImage(), "home"))
+                .placeholder(R.drawable.gif_loading_blue)
+                .error(R.drawable.ic_error_loading)
+                .into(movieView);
 
         setImageOnClickListener(movieView, movie);
 

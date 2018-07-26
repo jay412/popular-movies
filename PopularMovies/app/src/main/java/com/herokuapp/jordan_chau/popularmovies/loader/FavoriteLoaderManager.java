@@ -15,7 +15,7 @@ import com.herokuapp.jordan_chau.popularmovies.utils.FavoriteAdapter;
 public class FavoriteLoaderManager implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private FavoriteAdapter mAdapter;
-    private Context context;
+    private final Context context;
 
     public FavoriteLoaderManager(Context c, FavoriteAdapter fa) {
         context = c;

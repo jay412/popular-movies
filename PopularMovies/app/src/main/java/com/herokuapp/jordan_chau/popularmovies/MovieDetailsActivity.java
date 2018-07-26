@@ -9,8 +9,8 @@ import android.database.sqlite.SQLiteException;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,7 +18,6 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.herokuapp.jordan_chau.popularmovies.database.FavoriteContract;
 import com.herokuapp.jordan_chau.popularmovies.models.Movie;
@@ -35,11 +34,11 @@ import java.util.HashMap;
 
 public class MovieDetailsActivity extends AppCompatActivity {
     private TextView reviews;
-    private MenuItem star;
 
-    private HashMap<String, String> trailers;
+    private LinearLayout layout;
     private LinearLayout trailerLayout;
 
+    private HashMap<String, String> trailers;
     private Movie m;
 
     private final String YOUTUBE_URL = "https://www.youtube.com/watch?v=";
@@ -52,6 +51,8 @@ public class MovieDetailsActivity extends AppCompatActivity {
         //Creates the back arrow on the top left corner to return to MainActivity, DELETE PARENT?
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
+
+        layout = findViewById(R.id.detail_layout);
 
         ImageView image = findViewById(R.id.iv_image);
         TextView voteAverage = findViewById(R.id.tv_vote_average);
@@ -69,8 +70,18 @@ public class MovieDetailsActivity extends AppCompatActivity {
         m = intent.getParcelableExtra("movie");
         setTitle(m.getTitle());
 
-        Picasso.with(this).load(Movie.setPicSize(m.getImage(), "detail")).into(image);
-        Picasso.with(this).load(Movie.setPicSize(m.getBackDrop(), "backdrop")).into(backDrop);
+        Picasso.with(this)
+                .load(Movie.setPicSize(m.getImage(), "detail"))
+                .placeholder(R.drawable.gif_loading_blue)
+                .error(R.drawable.ic_error_loading)
+                .into(image);
+
+        Picasso.with(this)
+                .load(Movie.setPicSize(m.getBackDrop(), "backdrop"))
+                .placeholder(R.drawable.gif_loading_blue)
+                .error(R.drawable.ic_error_loading)
+                .into(backDrop);
+
         voteAverage.setText(m.getVoteAverage().toString().concat("/10"));
         plotSynopsis.setText(m.getPlotSynopsis());
         releaseDate.setText(m.getReleaseDate());
@@ -93,7 +104,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
             //checks for internet connection before proceeding
             if(!NetworkUtility.checkInternetConnection(context)) {
                 this.cancel(true);
-                Toast.makeText(context,"Please check your internet connection and try again.", Toast.LENGTH_LONG).show();
+                NetworkUtility.showErrorMessage(layout);
             }
             else {
                 super.onPreExecute();
@@ -171,14 +182,18 @@ public class MovieDetailsActivity extends AppCompatActivity {
 
     private void closeOnError() {
         finish();
-        Toast.makeText(this, R.string.detail_error_message, Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, R.string.detail_error_message, Toast.LENGTH_SHORT).show();
+        Snackbar snackbar = Snackbar
+                .make(layout, R.string.detail_error_message, Snackbar.LENGTH_LONG);
+
+        snackbar.show();
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.movie_details_menu, menu);
-        star = menu.findItem(R.id.action_favorite);
+        MenuItem star = menu.findItem(R.id.action_favorite);
 
         //check to see if movie is favorited or not
         if(star != null && isFavorited()) {
@@ -199,11 +214,19 @@ public class MovieDetailsActivity extends AppCompatActivity {
 
             try {
                 if (isFavorited()) {
-                    Toast.makeText(this,"Removed from favorites!", Toast.LENGTH_LONG).show();
+                    //Toast.makeText(this,"Removed from favorites!", Toast.LENGTH_LONG).show();
+                    Snackbar snackbar = Snackbar
+                            .make(layout, "Removed from favorites!", Snackbar.LENGTH_LONG);
+
+                    snackbar.show();
                     item.setIcon(R.drawable.ic_empty_star);
                     removeFromFavorites();
                 } else {
-                    Toast.makeText(this,"Added to favorites!", Toast.LENGTH_LONG).show();
+                    //Toast.makeText(this,"Added to favorites!", Toast.LENGTH_LONG).show();
+                    Snackbar snackbar = Snackbar
+                            .make(layout, "Added to favorites!", Snackbar.LENGTH_LONG);
+
+                    snackbar.show();
                     item.setIcon(R.drawable.ic_orange_star);
                     addToFavorites();
                 }
