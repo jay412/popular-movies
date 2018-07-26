@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteException;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -34,6 +35,7 @@ import java.util.HashMap;
 
 public class MovieDetailsActivity extends AppCompatActivity {
     private TextView reviews;
+    private MenuItem star;
 
     private HashMap<String, String> trailers;
     private LinearLayout trailerLayout;
@@ -158,7 +160,6 @@ public class MovieDetailsActivity extends AppCompatActivity {
                     //tv.setTypeface(custom_font);
                     tv.setText(name);
 
-                    //add button first, then textview
                     trailerLayout.addView(b);
                     trailerLayout.addView(tv);
                 }
@@ -177,6 +178,12 @@ public class MovieDetailsActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.movie_details_menu, menu);
+        star = menu.findItem(R.id.action_favorite);
+
+        //check to see if movie is favorited or not
+        if(star != null && isFavorited()) {
+            star.setIcon(R.drawable.ic_orange_star);
+        }
         return true;
     }
 
@@ -189,24 +196,20 @@ public class MovieDetailsActivity extends AppCompatActivity {
             finish();
             //handle favorite star presses
         } else if (id == R.id.action_favorite) {
-            //check to see which msg to display in case of duplicate favorite movies
-            Boolean showMsg = true;
 
             try {
-                addToFavorites();
+                if (isFavorited()) {
+                    Toast.makeText(this,"Removed from favorites!", Toast.LENGTH_LONG).show();
+                    item.setIcon(R.drawable.ic_empty_star);
+                    removeFromFavorites();
+                } else {
+                    Toast.makeText(this,"Added to favorites!", Toast.LENGTH_LONG).show();
+                    item.setIcon(R.drawable.ic_orange_star);
+                    addToFavorites();
+                }
             } catch (SQLiteException exception) {
-                showMsg = false;
-                removeFromFavorites();
-                Toast.makeText(this,"Removed from favorites!", Toast.LENGTH_LONG).show();
-                item.setIcon(R.drawable.ic_empty_star);
-
-                Log.v("MDA: ", "SQLiteException = " + exception);
-                exception.getStackTrace();
-            }
-
-            if(showMsg) {
-                Toast.makeText(this,"Added to favorites!", Toast.LENGTH_LONG).show();
-                item.setIcon(R.drawable.ic_green_star);
+                //Log.v("MDA: ", "SQLiteException = " + exception);
+                //exception.getStackTrace();
             }
 
             return true;
@@ -284,9 +287,17 @@ public class MovieDetailsActivity extends AppCompatActivity {
         getContentResolver().delete(uri, null, null);
     }
 
-    /*@Override
-    protected void onDestroy() {
-        mDbHelper.close();
-        super.onDestroy();
-    } */
+    private boolean isFavorited() {
+        String stringId = Integer.toString(m.getId());
+        Uri uri = FavoriteContract.FavoriteEntry.CONTENT_URI;
+        uri = uri.buildUpon().appendPath(stringId).build();
+
+        Cursor c = getContentResolver().query(uri, null, null, null, null);
+        if (c != null && c.getCount() > 0) {
+            c.close();
+            return true;
+        } else {
+            return false;
+        }
+    }
 }

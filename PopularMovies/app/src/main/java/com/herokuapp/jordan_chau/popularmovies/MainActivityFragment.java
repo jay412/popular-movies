@@ -56,6 +56,7 @@ public class MainActivityFragment extends Fragment {
         // Get a reference to the ListView, and attach this adapter to it.
         gridView = rootView.findViewById(R.id.grid);
 
+        //if there is a saved instance state
         if(savedInstanceState != null) {
             //save sort order
             sortOrder = savedInstanceState.getString(SORT_ORDER);
@@ -67,29 +68,25 @@ public class MainActivityFragment extends Fragment {
                 else
                     new GetOperation().execute(API_KEY, sortOrder);
 
-            } else if(movieAdapter != null && sortOrder.equals("top_rated")) {
+            } else if(sortOrder.equals("top_rated")) {
                 getActivity().setTitle("Top Rated");
-                gridView.setAdapter(movieAdapter);
-
-            } else if(mAdapter != null && sortOrder.equals("my_favorites")) {
-                getActivity().setTitle("My Favorites");
-                //getActivity().getSupportLoaderManager().restartLoader(FAVORITE_LOADER_ID, null, new FavoriteLoaderManager(getActivity(), mAdapter));
-                gridView.setAdapter(mAdapter);
-            }
-
-            else if (sortOrder != null) {
-                new GetOperation().execute(API_KEY, sortOrder);
-            }
+                if(movieAdapter != null)
+                    gridView.setAdapter(movieAdapter);
+                else
+                    new GetOperation().execute(API_KEY, sortOrder);
+            } 
 
             //move to previous position in gridview
             mCurrentPosition = savedInstanceState.getInt(GRID_POSITION);
             gridView.setSelection(mCurrentPosition);
         } else {
+
+            //default startup
             getActivity().setTitle("Most Popular");
 
             //favorites loader
-            mAdapter = new FavoriteAdapter(getActivity(), null);
-            getActivity().getSupportLoaderManager().initLoader(FAVORITE_LOADER_ID, null, new FavoriteLoaderManager(getActivity(), mAdapter));
+            //mAdapter = new FavoriteAdapter(getActivity(), null);
+            //getActivity().getSupportLoaderManager().initLoader(FAVORITE_LOADER_ID, null, new FavoriteLoaderManager(getActivity(), mAdapter));
 
             //places api key in the execute parameter, popular is default sort order
             new GetOperation().execute(API_KEY, "popular");
@@ -208,7 +205,8 @@ public class MainActivityFragment extends Fragment {
 
             case R.id.favorites:
                 getActivity().setTitle("My Favorites");
-                sortOrder = "my_favorites";
+                //sortOrder = "my_favorites";
+                mAdapter = new FavoriteAdapter(getActivity(), null);
                 getActivity().getSupportLoaderManager().restartLoader(FAVORITE_LOADER_ID, null, new FavoriteLoaderManager(getActivity(), mAdapter));
                 gridView.setAdapter(mAdapter);
                 return true;
